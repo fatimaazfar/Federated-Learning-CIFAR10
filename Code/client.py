@@ -71,9 +71,10 @@ class BalancedDataset(torch.utils.data.Dataset):
             img = self.transform(img)
         return img, label
 
-balanced_dataset = BalancedDataset(features_resampled, labels_resampled)
+balanced_dataset = BalancedDataset(features_resampled, labels_resampled, transform=None)
 
-# Ensure each client gets only 2 images per class
+# Ensure each client gets 10 images per class
+num_of_images = 2
 client_id = int(sys.argv[1])
 class_indices = defaultdict(list)
 for idx, (_, label) in enumerate(balanced_dataset):
@@ -81,7 +82,7 @@ for idx, (_, label) in enumerate(balanced_dataset):
 
 client_indices = []
 for class_idx in class_indices:
-    selected_indices = class_indices[class_idx][client_id*2:(client_id+1)*2]
+    selected_indices = class_indices[class_idx][client_id*num_of_images:(client_id+1)*num_of_images]
     client_indices.extend(selected_indices)
 
 # Create a Subset for the client dataset
@@ -91,7 +92,7 @@ train_size = int(0.8 * len(client_dataset))
 test_size = len(client_dataset) - train_size
 train_dataset, test_dataset = random_split(client_dataset, [train_size, test_size])
 
-batch_size = 1  # Update to 1 since each client has only a few images
+batch_size = 2  # Adjust batch size as needed
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0)
 test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
 
