@@ -74,7 +74,7 @@ class BalancedDataset(torch.utils.data.Dataset):
 balanced_dataset = BalancedDataset(features_resampled, labels_resampled, transform=None)
 
 # Ensure each client gets 10 images per class
-num_of_images = 2
+num_of_images = 1
 client_id = int(sys.argv[1])
 class_indices = defaultdict(list)
 for idx, (_, label) in enumerate(balanced_dataset):
