@@ -13,11 +13,11 @@ client_id = int(sys.argv[1])
 
 # Split the dataset for each client
 if client_id == 1:
-    client_data = (x_train[:16666], y_train[:16666])
+    client_data = (x_train[1:15], y_train[1:15])
 elif client_id == 2:
-    client_data = (x_train[16666:33332], y_train[16666:33332])
+    client_data = (x_train[15:30], y_train[15:30])
 elif client_id == 3:
-    client_data = (x_train[33332:], y_train[33332:])
+    client_data = (x_train[30:45], y_train[30:45])
 
 # Define a simple model
 def create_model():
