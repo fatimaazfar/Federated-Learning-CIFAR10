@@ -1,26 +1,18 @@
 import flwr as fl
-import tensorflow as tf
+import torch
 import numpy as np
 import pickle
 from typing import Dict, List, Tuple
+from torchvision import models
 
 # Define a simple model
-def create_model():
-    model = tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(64, activation='relu'),
-        tf.keras.layers.Dense(10, activation='softmax')
-    ])
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+def create_model(num_classes):
+    model = models.resnet101(pretrained=True)
+    model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
     return model
 
 # Define custom aggregation functions
 def aggregate_fit_metrics(metrics: List[Tuple[int, Dict[str, fl.common.Scalar]]]) -> Dict[str, fl.common.Scalar]:
-    print("Fit metrics received:", metrics)
     accuracy_list = [m[1].get("accuracy", 0) for m in metrics]
     loss_list = [m[1].get("loss", 0) for m in metrics]
     return {
@@ -29,7 +21,6 @@ def aggregate_fit_metrics(metrics: List[Tuple[int, Dict[str, fl.common.Scalar]]]
     }
 
 def aggregate_evaluate_metrics(metrics: List[Tuple[int, Dict[str, fl.common.Scalar]]]) -> Dict[str, fl.common.Scalar]:
-    print("Evaluate metrics received:", metrics)
     accuracy_list = [m[1].get("accuracy", 0) for m in metrics]
     loss_list = [m[1].get("loss", 0) for m in metrics]
     return {
