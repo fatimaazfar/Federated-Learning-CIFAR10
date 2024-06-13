@@ -1,10 +1,10 @@
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, roc_curve, auc, precision_recall_fscore_support
 from sklearn.preprocessing import label_binarize
 from itertools import cycle
-import flwr as fl
+import pickle  # Import pickle for loading the saved parameters
 
 # Load CIFAR-10 dataset
 (_, _), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
@@ -26,9 +26,9 @@ def create_model():
     return model
 
 # Load global model parameters
-strategy = fl.server.strategy.FedAvg()
 global_model = create_model()
-global_parameters = fl.common.parameters_to_ndarrays(strategy.parameters)
+with open("global_parameters.pkl", "rb") as f:
+    global_parameters = pickle.load(f)
 global_model.set_weights(global_parameters)
 
 # Evaluate global model

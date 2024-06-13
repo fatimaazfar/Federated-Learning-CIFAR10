@@ -13,11 +13,11 @@ client_id = int(sys.argv[1])
 
 # Split the dataset for each client
 if client_id == 1:
-    client_data = (x_train[1:15], y_train[1:15])
+    client_data = (x_train[1:5], y_train[1:5])
 elif client_id == 2:
-    client_data = (x_train[15:30], y_train[15:30])
+    client_data = (x_train[5:10], y_train[5:10])
 elif client_id == 3:
-    client_data = (x_train[30:45], y_train[30:45])
+    client_data = (x_train[10:15], y_train[10:15])
 
 # Define a simple model
 def create_model():
@@ -44,8 +44,12 @@ class CifarClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         self.model.set_weights(parameters)
-        self.model.fit(self.x_train, self.y_train, epochs=1, batch_size=32, verbose=0)
-        return self.model.get_weights(), len(self.x_train), {}
+        history = self.model.fit(self.x_train, self.y_train, epochs=1, batch_size=32, verbose=0)
+        results = {
+            "loss": history.history["loss"][0],
+            "accuracy": history.history["accuracy"][0],
+        }
+        return self.model.get_weights(), len(self.x_train), results
 
     def evaluate(self, parameters, config):
         self.model.set_weights(parameters)
